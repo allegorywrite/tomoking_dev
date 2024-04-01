@@ -1,12 +1,13 @@
 import { Post } from '@prisma/client';
 import { renderLayout } from '../layout/layout';
+import { marked } from 'marked';
+import { JSDOM } from 'jsdom';
 
 export const renderLanding = (posts: Post[], isAuthenticated?: boolean) => renderLayout(`
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script>
     MathJax = {
         tex: {
-        // inlineMath: [['$', '$'], ['\\(', '\\)']],
         inlineMath: [['\\$', '\\$'], ['\\\\(', '\\\\)']],
         processEscapes: true,
         },
@@ -23,7 +24,7 @@ export const renderLanding = (posts: Post[], isAuthenticated?: boolean) => rende
     ${posts.map(post => `
         <div>
         <h2><a href="/blog/ja/posts/${post.title}/">${post.title}</a></h2>
-        <p>${post.content.slice(0, 100)}...</p>
+        <p>${post.abstract}...</p>
         </div>
     `).join('')}
 `);

@@ -50,14 +50,16 @@ export const getEditPost = async (req: AuthRequest, res: Response) => {
 
 export const createPost = async (req: Request, res: Response) => {
   const { title, content } = req.body;
+  // TODO
+  const abstract = "abstract";
   const post = await prisma.post.create({
-    data: { title, content },
+    data: { title, content, abstract },
   });
   res.json(post);
 };
 
 export const updatePost = async (req: Request, res: Response) => {
-  const { postId, title, content } = req.body;
+  const { postId, title, content, abstract } = req.body;
   const post = await prisma.post.update({
     where: { id: Number(postId) },
     data: { title, content },

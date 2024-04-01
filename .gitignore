@@ -27,3 +27,4 @@ amplifytools.xcconfig
 
 .amplify-hosting
 .vercel
+.env*.local

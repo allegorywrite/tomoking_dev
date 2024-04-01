@@ -1,6 +1,6 @@
 import { renderLayout } from '../layout/layout';
 
-const renderEditor = () => `
+const renderEditor = () => /*html*/`
     <div>
     <label for="title">タイトル:</label>
     <input type="text" id="title" name="title" required>
@@ -12,33 +12,33 @@ const renderEditor = () => `
     <button type="submit">投稿</button>
 `;
 
-const renderPreview = () => `
+const renderPreview = () => /*html*/`
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script>
-    MathJax = {
-    tex: {
-    inlineMath: [['\\$', '\\$'], ['\\\\(', '\\\\)']],
-    processEscapes: true,
-    },
-    svg: {
-    fontCache: 'global',
-    },
-    startup: {
-        ready: () => {
-            MathJax.startup.defaultReady();
-            MathJax.startup.promise.then(() => {
-                MathJax.texReset();
-                MathJax.typesetClear();
-            });
+        MathJax = {
+        tex: {
+        inlineMath: [['\\$', '\\$'], ['\\\\(', '\\\\)']],
+        processEscapes: true,
         },
-    },
-    options: {
-        ignoreHtmlClass: 'tex2jax_ignore',
-        processHtmlClass: 'tex2jax_process',
-        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'annotation', 'selector'],
-        ignoreHtmlClass: 'no-mathjax'
-    },
-    };
+        svg: {
+        fontCache: 'global',
+        },
+        startup: {
+            ready: () => {
+                MathJax.startup.defaultReady();
+                MathJax.startup.promise.then(() => {
+                    MathJax.texReset();
+                    MathJax.typesetClear();
+                });
+            },
+        },
+        options: {
+            ignoreHtmlClass: 'tex2jax_ignore',
+            processHtmlClass: 'tex2jax_process',
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'annotation', 'selector'],
+            ignoreHtmlClass: 'no-mathjax'
+        },
+        };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <div id="preview"></div>
@@ -56,33 +56,51 @@ export const renderCreatePost = () => renderLayout(`
     ${renderPreview()}
     </div>
     </div>
-    <script>
-    const form = document.getElementById('createPostForm');
-    const contentInput = document.getElementById('content');
-    const previewDiv = document.getElementById('preview');
-    contentInput.addEventListener('input', () => {
-    previewDiv.innerHTML = contentInput.innerHTML;
-    MathJax.typeset();
-    });
-    form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const title = document.getElementById('title').value;
-    const content = contentInput.innerHTML;
-    const token = localStorage.getItem('token');
-    const response = await fetch('/blog/ja/posts/', {
-    method: 'POST',
-    headers: {
-    'Content-Type': 'application/json',
-    'Authorization': \`Bearer \${token}\`,
-    },
-    body: JSON.stringify({ title, content }),
-    });
-    if (response.ok) {
-    alert('記事が投稿されました');
-    window.location.href = '/blog/ja/';
-    } else {
-    alert('記事の投稿に失敗しました');
-    }
-    });
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>   
+        const form = document.getElementById('createPostForm');
+        const contentInput = document.getElementById('content');
+        const previewDiv = document.getElementById('preview');
+
+        marked.setOptions({
+            highlight: function(code, lang) {
+              if (lang && hljs.getLanguage(lang)) {
+                return hljs.highlight(code, { language: lang }).value;
+              } else {
+                return hljs.highlightAuto(code).value;
+              }
+            },
+        });
+
+        contentInput.addEventListener('input', () => {
+            const markdownText = contentInput.innerText;
+            const htmlText = marked.parse(markdownText, { breaks: true });
+            previewDiv.innerHTML = htmlText;
+            MathJax.typeset();
+            hljs.highlightAll();
+          });
+
+        form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const title = document.getElementById('title').value;
+        const content = contentInput.innerText;
+        const token = localStorage.getItem('token');
+        const response = await fetch('/blog/ja/posts/', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        'Authorization': \`Bearer \${token}\`,
+        },
+        body: JSON.stringify({ title, content }),
+        });
+        if (response.ok) {
+        alert('記事が投稿されました');
+        window.location.href = '/blog/ja/';
+        } else {
+        alert('記事の投稿に失敗しました');
+        }
+        });
     </script>
 `);

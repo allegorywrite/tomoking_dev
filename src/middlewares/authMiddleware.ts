@@ -25,18 +25,19 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 };
 
 export const authSessionMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const token = req.session.token;
-  if (!token) {
-    return res.redirect('/auth/login');
-  }
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    req.userId = decoded.userId;
-    req.authenticated = true;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Invalid token' });
-  }
+  // const token = req.session.token;
+  // if (!token) {
+  //   return res.redirect('/auth/login');
+  // }
+  // try {
+  //   const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+  //   req.userId = decoded.userId;
+  //   req.authenticated = true;
+  //   next();
+  // } catch (error) {
+  //   res.status(401).json({ message: 'Invalid token' });
+  // }
+  console.log("hogehoge");
 };
 
 export const checkSessionMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
